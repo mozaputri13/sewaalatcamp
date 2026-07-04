@@ -1,0 +1,276 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* BODY */
+body {
+  font-family: 'Open Sans', sans-serif;
+  background: #f1f5f2;
+  color: #2e2e2e;
+}
+
+/* NAVBAR */
+#navbar {
+  background: #1f3d2b;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+.logo span {
+  color: #6bbf59;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  color: #d1d5db;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: #6bbf59;
+}
+
+/* HERO */
+.hero {
+  height: 90vh;
+  background: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1400') center/cover;
+  position: relative;
+}
+
+.hero-overlay {
+  background: rgba(0,0,0,0.5);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-text {
+  text-align: center;
+  color: white;
+}
+
+.hero-text h1 {
+  font-size: 3rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.hero-text p {
+  margin-top: 10px;
+}
+
+/* BUTTON */
+.btn-primary {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  background: #6bbf59;
+  color: white;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  background: #4e9f3d;
+}
+
+/* SECTION */
+.container {
+  max-width: 1100px;
+  margin: 50px auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.section-title h2 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.line {
+  width: 60px;
+  height: 4px;
+  background: #6bbf59;
+  margin: 10px auto;
+  border-radius: 10px;
+}
+
+/* PRODUCT GRID */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* CARD */
+.product-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  transition: 0.3s;
+  position: relative;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+/* IMAGE */
+.img-box {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+}
+
+/* DETAIL */
+.product-detail {
+  padding: 15px;
+}
+
+.price {
+  color: #6bbf59;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+/* BUTTON ADD */
+.btn-add {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #1f3d2b;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-add:hover {
+  background: #6bbf59;
+}
+
+/* BADGE */
+.badge {
+  position: absolute;
+  background: #6bbf59;
+  color: white;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  top: 10px;
+  left: 10px;
+  border-radius: 5px;
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.btn-wa {
+  width: 100%;
+  padding: 12px;
+  background: #25d366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* REVIEW */
+.review-grid {
+  max-width: 800px;
+  margin: auto;
+}
+
+.review-item {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* FORM */
+.review-form input,
+.review-form textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.review-form button {
+  margin-top: 10px;
+  padding: 10px;
+  background: #1f3d2b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #1f3d2b;
+  color: white;
+  margin-top: 50px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+}

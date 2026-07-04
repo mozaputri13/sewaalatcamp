@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sewa Sewaan Jampang | Outdoor Rental</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">SewaSewaan<span>Jampang</span></div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#katalog">Equipment</a></li>
+                <li><a href="#ulasan">Reviews</a></li>
+            </ul>
+            <div class="cart-trigger" onclick="toggleCart()">
+                <span class="cart-icon">🛒</span>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <header id="home" class="hero">
+        <div class="hero-overlay">
+            <div class="hero-text">
+                <h4>READY FOR ADVENTURE?</h4>
+                <h1>EXPLORE THE NATURE</h1>
+                <p>Sewa perlengkapan outdoor kualitas premium. Tangguh, bersih, dan estetik.</p>
+                <a href="#katalog" class="btn-primary">MULAI SEWA</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="katalog" class="container">
+        <div class="section-title">
+            <h2>Our Equipment</h2>
+            <div class="line"></div>
+        </div>
+
+        <div class="product-grid" id="product-grid">
+            <div style="grid-column: 1/-1; text-align: center; color: #718096; padding: 40px 0;">
+                <p>Memuat katalog alat camp...</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Pesanan Anda</h2>
+                <span class="close" onclick="toggleCart()">&times;</span>
+            </div>
+            <div id="cart-items"></div>
+            <div class="modal-footer">
+                <div class="total-row">
+                    <span>Total Bayar:</span>
+                    <span id="total-price">Rp 0</span>
+                </div>
+                <button class="btn-wa" onclick="checkoutWA()">Checkout via WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <section id="ulasan" class="container reviews-section">
+        <div class="section-title">
+            <h2>Customer Stories</h2>
+            <div class="line"></div>
+        </div>
+        <div id="review-list" class="review-grid">
+            <div class="review-item">
+                <p>"Kualitas alat luar biasa, tenda bersih dan wangi. Pelayanan admin sangat cepat!"</p>
+                <h5>— Bagas Pratama</h5>
+            </div>
+        </div>
+        <div class="review-form">
+            <input type="text" id="rev-name" placeholder="Nama Anda">
+            <textarea id="rev-text" placeholder="Berikan ulasan Anda..."></textarea>
+            <button id="rev-btn" onclick="addReview()">Kirim Ulasan</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 SewaSewaan AlatCamp Jampang. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>

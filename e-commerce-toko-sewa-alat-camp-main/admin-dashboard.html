@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin | SewaSewaan Jampang</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Config File -->
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --primary-color: #1f3d2b;
+            --accent-color: #6bbf59;
+            --accent-hover: #4e9f3d;
+            --bg-color: #f3f6f4;
+            --text-color: #2e2e2e;
+            --white: #ffffff;
+            --danger-color: #e63946;
+            --danger-hover: #c1121f;
+            --warning-color: #ffb703;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: var(--white);
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-email {
+            font-size: 0.9rem;
+            color: #d1d5db;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background-color: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background-color: var(--white);
+            color: var(--primary-color);
+            border-color: var(--white);
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dashboard-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            position: relative;
+        }
+
+        .dashboard-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        .btn-add-product {
+            padding: 12px 24px;
+            background-color: var(--accent-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(107, 191, 89, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add-product:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(78, 159, 61, 0.3);
+        }
+
+        /* STATS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-info h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .stat-icon {
+            font-size: 2.2rem;
+            color: var(--accent-color);
+            opacity: 0.8;
+        }
+
+        /* DATA TABLE CONTAINER */
+        .table-container {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .table-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: #2d3748;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .product-thumbnail {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .price-tag {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .stock-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stock-badge.in-stock {
+            background-color: #eef9ee;
+            color: #2e7d32;
+        }
+
+        .stock-badge.low-stock {
+            background-color: #fff9db;
+            color: #b27b00;
+        }
+
+        .stock-badge.out-of-stock {
+            background-color: #ffebeb;
+            color: #d32f2f;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-edit {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-edit:hover {
+            background-color: #cbd5e0;
+            color: #2d3748;
+        }
+
+        .btn-delete {
+            background-color: #ffebeb;
+            color: #e63946;
+        }
+
+        .btn-delete:hover {
+            background-color: #ffd1d1;
+            color: #c1121f;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #a0aec0;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: #4a5568;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(107,191,89,0.15);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn-cancel {
+            padding: 10px 20px;
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e2e8f0;
+        }
+
+        .btn-save {
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-save:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+        }
+
+        .toast {
+            background-color: #2d3748;
+            color: var(--white);
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .toast.toast-error {
+            border-left-color: var(--danger-color);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* LOADING OVERLAY */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255,255,255,0.7);
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner-large {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: #d1d5db;
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .table-container {
+                overflow-x: auto;
+            }
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .btn-add-product {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner-large"></div>
+    </div>
+
+    <header>
+        <div class="header-container">
+            <div class="logo">SewaSewaan<span>Jampang</span></div>
+            <div class="admin-profile">
+                <span id="adminEmail" class="admin-email">Admin Mode</span>
+                <button class="btn-logout" onclick="handleLogout()">LOGOUT</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard-header">
+            <div>
+                <h1>Dashboard Produk</h1>
+            </div>
+            <button class="btn-add-product" onclick="openAddModal()">
+                <span>➕</span> Tambah Alat Camp
+            </button>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Produk</h3>
+                    <p id="statTotalProducts">0</p>
+                </div>
+                <div class="stat-icon">🏕️</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Stok Barang</h3>
+                    <p id="statTotalStock">0</p>
+                </div>
+                <div class="stat-icon">📦</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Alat Habis / Low</h3>
+                    <p id="statLowStock">0</p>
+                </div>
+                <div class="stat-icon">⚠️</div>
+            </div>
+        </div>
+
+        <!-- DATA TABLE -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>Kelola Perlengkapan Camping</h2>
+            </div>
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Gambar</th>
+                        <th>Nama Alat</th>
+                        <th>Harga Sewa (/hari)</th>
+                        <th>Stok</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #718096;">
+                            Sedang memuat data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- FORM MODAL (ADD & EDIT) -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Alat Camp</h2>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <input type="hidden" id="productId">
+
+                <div class="form-group">
+                    <label for="namaAlat">Nama Alat</label>
+                    <input type="text" id="namaAlat" required placeholder="Contoh: Tenda Dome Eiger">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hargaSewa">Harga Sewa (Rp)</label>
+                        <input type="number" id="hargaSewa" required min="0" placeholder="Contoh: 35000">
+                    </div>
+                    <div class="form-group">
+                        <label for="stok">Stok Barang</label>
+                        <input type="number" id="stok" required min="0" placeholder="Contoh: 5">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="gambarUrl">File/URL Gambar</label>
+                    <input type="text" id="gambarUrl" required placeholder="Contoh: tenda .jpg.jpeg atau https://...">
+                    <small style="color: #718096; font-size: 0.75rem; margin-top: 4px; display: block;">
+                        *Masukkan nama file lokal (misal: <code>tenda .jpg.jpeg</code>) atau URL lengkap gambar.
+                    </small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn-save" id="btnSave">Simpan Produk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <footer>
+        <p>&copy; 2024 SewaSewaan AlatCamp Jampang. Dashboard Panel Administrator.</p>
+    </footer>
+
+    <script>
+        let currentEditId = null;
+
+        // Validasi Auth & Dapatkan Data Sesi saat Halaman Dimuat
+        window.addEventListener('DOMContentLoaded', async () => {
+            showLoading(true);
+
+            if (!supabaseClient) {
+                showToast("Konfigurasi Supabase tidak ditemukan. Isi file config.js!", "error");
+                showLoading(false);
+                return;
+            }
+
+            try {
+                // Periksa apakah user terautentikasi
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (error || !session) {
+                    // Simpan pesan error dan redirect ke halaman login
+                    showToast("Sesi habis atau belum login. Mengalihkan ke login...", "error");
+                    setTimeout(() => {
+                        window.location.href = 'admin-login.html';
+                    }, 1500);
+                    return;
+                }
+
+                // Tampilkan email admin di header
+                document.getElementById('adminEmail').innerText = `Admin: ${session.user.email}`;
+                
+                // Ambil data produk
+                await fetchProducts();
+
+            } catch (err) {
+                console.error("Auth validation failed:", err);
+                window.location.href = 'admin-login.html';
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Tampilkan loading overlay
+        function showLoading(visible) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = visible ? 'flex' : 'none';
+        }
+
+        // Tampilkan Toast
+        function showToast(message, type = "success") {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'toast-error' : ''}`;
+            toast.innerHTML = `
+                <span>${type === 'error' ? '❌' : '✅'}</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+
+            // Hapus element dari DOM setelah animasi selesai (3 detik total)
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Logout
+        async function handleLogout() {
+            showLoading(true);
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+
+                showToast("Berhasil Logout. Sampai jumpa!");
+                setTimeout(() => {
+                    window.location.href = 'admin-login.html';
+                }, 1000);
+            } catch (err) {
+                showLoading(false);
+                showToast(`Gagal Logout: ${err.message}`, "error");
+            }
+        }
+
+        // Fetch Produk dari Supabase
+        async function fetchProducts() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('alat_camp')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                renderTable(data);
+                updateStats(data);
+
+            } catch (err) {
+                console.error("Gagal memuat produk:", err);
+                showToast(`Gagal memuat data: ${err.message}`, "error");
+            }
+        }
+
+        // Render data produk ke tabel HTML
+        function renderTable(products) {
+            const tbody = document.getElementById('productTableBody');
+            
+            if (!products || products.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #718096;">
+                            Belum ada produk terdaftar. Klik tombol "+ Tambah Alat Camp" untuk menambahkan.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = products.map(prod => {
+                // URL Gambar Handler (jika file lokal)
+                const isLocalImage = !prod.gambar_url.startsWith('http://') && !prod.gambar_url.startsWith('https://');
+                const finalImgUrl = isLocalImage ? encodeURI(prod.gambar_url) : prod.gambar_url;
+
+                // Tentukan Badge Stok
+                let stockClass = 'in-stock';
+                let stockText = `${prod.stok} unit`;
+                if (prod.stok === 0) {
+                    stockClass = 'out-of-stock';
+                    stockText = 'Habis';
+                } else if (prod.stok < 3) {
+                    stockClass = 'low-stock';
+                    stockText = `${prod.stok} unit (Tinggal Dikit)`;
+                }
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="product-thumbnail" style="background-image: url('${finalImgUrl}');"></div>
+                        </td>
+                        <td style="font-weight: 600;">${prod.nama_alat}</td>
+                        <td><span class="price-tag">Rp ${prod.harga_sewa.toLocaleString('id-ID')}</span></td>
+                        <td><span class="stock-badge ${stockClass}">${stockText}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-edit" onclick="openEditModal(${prod.id}, '${prod.nama_alat.replace(/'/g, "\\'")}', ${prod.harga_sewa}, ${prod.stok}, '${prod.gambar_url.replace(/'/g, "\\'")}')">
+                                    ✏️ Edit
+                                </button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(${prod.id}, '${prod.nama_alat.replace(/'/g, "\\'")}')">
+                                    🗑️ Hapus
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Perbarui data ringkasan statistik
+        function updateStats(products) {
+            const totalProducts = products.length;
+            const totalStock = products.reduce((sum, p) => sum + p.stok, 0);
+            const lowStockCount = products.filter(p => p.stok < 3).length;
+
+            document.getElementById('statTotalProducts').innerText = totalProducts;
+            document.getElementById('statTotalStock').innerText = totalStock;
+            document.getElementById('statLowStock').innerText = lowStockCount;
+        }
+
+        // Modal Open - Tambah
+        function openAddModal() {
+            currentEditId = null;
+            document.getElementById('modalTitle').innerText = "Tambah Alat Camp";
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = "";
+            
+            const modal = document.getElementById('productModal');
+            modal.classList.add('show');
+        }
+
+        // Modal Open - Edit
+        function openEditModal(id, nama, harga, stok, gambarUrl) {
+            currentEditId = id;
+            document.getElementById('modalTitle').innerText = "Edit Alat Camp";
+            document.getElementById('productId').value = id;
+            document.getElementById('namaAlat').value = nama;
+            document.getElementById('hargaSewa').value = harga;
+            document.getElementById('stok').value = stok;
+            document.getElementById('gambarUrl').value = gambarUrl;
+
+            const modal = document.getElementById('productModal');
+            modal.classList.add('show');
+        }
+
+        // Modal Close
+        function closeModal() {
+            const modal = document.getElementById('productModal');
+            modal.classList.remove('show');
+        }
+
+        // Close modal when clicking outside content area
+        window.onclick = function(event) {
+            const modal = document.getElementById('productModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Simpan Data Produk (INSERT atau UPDATE)
+        async function saveProduct(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('productId').value;
+            const nama = document.getElementById('namaAlat').value.trim();
+            const harga = parseInt(document.getElementById('hargaSewa').value);
+            const stok = parseInt(document.getElementById('stok').value);
+            const gambar = document.getElementById('gambarUrl').value.trim();
+
+            if (!nama || isNaN(harga) || isNaN(stok) || !gambar) {
+                showToast("Lengkapi form isian dengan benar!", "error");
+                return;
+            }
+
+            showLoading(true);
+            closeModal();
+
+            const productData = {
+                nama_alat: nama,
+                harga_sewa: harga,
+                stok: stok,
+                gambar_url: gambar
+            };
+
+            try {
+                if (id) {
+                    // Mode UPDATE
+                    const { error } = await supabaseClient
+                        .from('alat_camp')
+                        .update(productData)
+                        .eq('id', id);
+
+                    if (error) throw error;
+                    showToast("Produk berhasil diubah!");
+                } else {
+                    // Mode INSERT
+                    const { error } = await supabaseClient
+                        .from('alat_camp')
+                        .insert([productData]);
+
+                    if (error) throw error;
+                    showToast("Produk baru berhasil ditambahkan!");
+                }
+
+                // Ambil ulang data terbaru
+                await fetchProducts();
+
+            } catch (err) {
+                console.error("Gagal menyimpan produk:", err);
+                showToast(`Gagal menyimpan: ${err.message}`, "error");
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Hapus Produk (DELETE)
+        async function deleteProduct(id, nama) {
+            const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus produk "${nama}" dari database?`);
+            if (!confirmDelete) return;
+
+            showLoading(true);
+            try {
+                const { error } = await supabaseClient
+                    .from('alat_camp')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showToast(`Produk "${nama}" telah dihapus.`);
+                await fetchProducts();
+
+            } catch (err) {
+                console.error("Gagal menghapus produk:", err);
+                showToast(`Gagal menghapus: ${err.message}`, "error");
+            } finally {
+                showLoading(false);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin | SewaSewaan Jampang</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Config File -->
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --primary-color: #1f3d2b;
+            --accent-color: #6bbf59;
+            --accent-hover: #4e9f3d;
+            --bg-color: #f1f5f2;
+            --text-color: #2e2e2e;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow-color: rgba(31, 61, 43, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #1f3d2b 0%, #112218 100%);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .login-header .logo span {
+            color: var(--accent-color);
+        }
+
+        .login-header p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8e3;
+            background: #fcfdfe;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(107, 191, 89, 0.15);
+            background: #fff;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(107, 191, 89, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 6px 20px rgba(78, 159, 61, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alert-error {
+            background: #ffebeb;
+            color: #d32f2f;
+            border: 1px solid #ffccd2;
+        }
+
+        .alert-success {
+            background: #eef9ee;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .back-link a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-link a:hover {
+            color: var(--accent-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">SewaSewaan<span>Jampang</span></div>
+            <p>Portal Khusus Administrator Toko</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="email">Email Admin</label>
+                <input type="email" id="email" required placeholder="admin@sewajampang.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" id="btnSubmit" class="btn-submit">
+                MASUK KE DASHBOARD
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html">← Kembali ke Halaman Utama</a>
+        </div>
+    </div>
+
+    <script>
+        // Cek sesi aktif saat halaman dibuka
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Validasi konfigurasi terlebih dahulu
+            if (!supabaseClient) {
+                showAlert('Konfigurasi Supabase tidak ditemukan. Harap isi file config.js!', 'error');
+                document.getElementById('btnSubmit').disabled = true;
+                return;
+            }
+
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (session) {
+                    window.location.href = 'admin-dashboard.html';
+                }
+            } catch (err) {
+                console.error("Gagal mendapatkan session:", err);
+            }
+        });
+
+        // Tampilkan notifikasi alert
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alert');
+            alertBox.innerText = message;
+            alertBox.className = `alert alert-${type}`;
+            alertBox.style.display = 'block';
+        }
+
+        // Handle Login Admin
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btnSubmit = document.getElementById('btnSubmit');
+            const alertBox = document.getElementById('alert');
+
+            // Reset alert
+            alertBox.style.display = 'none';
+
+            if (!email || !password) {
+                showAlert('Harap isi semua input!', 'error');
+                return;
+            }
+
+            // Loading state
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<span class="spinner"></span> Memproses Masuk...';
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                showAlert('Login Berhasil! Mengalihkan...', 'success');
+                
+                // Redirect ke Dashboard Admin setelah 1.5 detik
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 1200);
+
+            } catch (error) {
+                console.error("Login error:", error);
+                showAlert(`Gagal Login: ${error.message || 'Email atau Password salah'}`, 'error');
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'MASUK KE DASHBOARD';
+            }
+        }
+    </script>
+</body>
+</html>
